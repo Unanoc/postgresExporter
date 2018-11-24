@@ -5,10 +5,11 @@ DROP TABLE IF EXISTS "cities" CASCADE;
 CREATE TABLE IF NOT EXISTS people (
   "nickname"  CITEXT UNIQUE PRIMARY KEY,
   "firstname" CITEXT UNIQUE NOT NULL,
-  "lasname"   CITEXT UNIQUE NOT NULL,
+  "lastname" CITEXT UNIQUE NOT NULL,
   "email"     CITEXT UNIQUE NOT NULL,
   "phone"     CITEXT NOT NULL,
-  "about"     TEXT
+  "about"     TEXT,
+  "birthday"  timestamp not null
 );
 
 -- TABLE "cities" --
