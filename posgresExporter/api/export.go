@@ -19,8 +19,8 @@ func WorkerExport(ctx context.Context, wg *sync.WaitGroup, conn *pgx.ConnPool, o
 			return
 		case task := <-tasks:
 			recordChan := make(chan []string)
-			go CreateCSV(ctx, task.Name, task.MaxLines, recordChan)
-			database.Query(conn, task.Query, recordChan)
+			go CreateCSV(ctx, task.MaxLines, recordChan)
+			database.Query(conn, task.Query, task.Name, recordChan)
 		}
 	}
 }
