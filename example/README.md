@@ -7,6 +7,7 @@ sh create_db.sh
 
 ### Экспорт данных из PostgreSQL в CSV
 ```
+cd ../postgresExporter
 go run main.go --config="../example/config.json" --threads=4
 ```
 
