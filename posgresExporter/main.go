@@ -1,11 +1,17 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"io/ioutil"
 	"log"
+	"os"
+	"os/signal"
+	"psqlexport/api"
 	"psqlexport/config"
 	"psqlexport/database"
+	"sync"
+	"syscall"
 )
 
 var (
@@ -21,34 +27,41 @@ func main() {
 		log.Panic(err)
 	}
 
-	config := config.Config{}
-	config.UnmarshalJSON(configFile)
+	configInstance := config.Config{}
+	configInstance.UnmarshalJSON(configFile)
 
 	db := database.DB{}
-	if err := db.Connect(config.Connection); err != nil {
+	if err := db.Connect(configInstance.Connection); err != nil {
 		log.Panic(err)
 	}
 
-	err = database.Query(db.Conn, "select firstname, lasname, birthday, email, phone, about, nickname from people")
-	if err != nil {
-		log.Print(err)
+	wg := &sync.WaitGroup{}
+	ctx, finish := context.WithCancel(context.Background())
+
+	if *numThreads > len(configInstance.Tables) {
+		*numThreads = len(configInstance.Tables)
 	}
-	// wg := &sync.WaitGroup{}
-	// stopChan := make(chan struct{})
-	// for i := 0; i < *numThreads; i++ {
-	// 	wg.Add(1)
-	// 	go api.Export(wg, stopChan, config.OutDir, config.Name, config.Query, config.MaxLines)
-	// }
 
-	// syscallChan := make(chan os.Signal, 1)
-	// signal.Notify(syscallChan, syscall.SIGINT, syscall.SIGTERM)
+	taskChan := make(chan config.Table, *numThreads)
+	for i := 0; i < *numThreads; i++ {
+		wg.Add(1)
+		go api.WorkerExport(ctx, wg, configInstance.OutputDir, taskChan, i)
+	}
 
-	// go func() {
-	// 	<-syscallChan // goroutine will be frozed at here cause it will be wating until signal is received.
-	// 	log.Println("Shutting down...")
-	// 	db.Disconnect()
-	// 	close(stopChan)
-	// 	os.Exit(0)
-	// }()
-	// wg.Wait()
+	for _, table := range configInstance.Tables {
+		taskChan <- *table
+	}
+	finish()
+
+	syscallChan := make(chan os.Signal, 1)
+	signal.Notify(syscallChan, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-syscallChan
+		log.Println("Shutting down...")
+		finish()
+		db.Disconnect()
+		os.Exit(0)
+	}()
+	wg.Wait()
 }
