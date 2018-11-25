@@ -28,7 +28,7 @@ func Query(conn *pgx.ConnPool, queryString, tableName string, recordChan chan<- 
 		titles = append(titles, value.Name)
 	}
 
-	recordChan <- titles
+	recordChan <- titles[1:]
 
 	for rows.Next() {
 		rowsRecord := make([]string, 1)
@@ -45,7 +45,7 @@ func Query(conn *pgx.ConnPool, queryString, tableName string, recordChan chan<- 
 				rowsRecord = append(rowsRecord, row[:len(row)-1]) // remove "\n"
 			}
 		}
-		recordChan <- rowsRecord
+		recordChan <- rowsRecord[1:]
 	}
 
 	if err != nil {
