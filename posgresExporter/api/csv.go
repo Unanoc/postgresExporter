@@ -19,15 +19,25 @@ func CreateCSV(ctx context.Context, maxLines int, output, tableName string, reco
 	var csvWriter *csv.Writer
 	var fileExist bool
 
+	if output[len(output)-1:] == "/" {
+		output = fmt.Sprintf("%s%s", output, tableName)
+	} else {
+		output = fmt.Sprintf("%s/%s", output, tableName)
+	}
+
+	if _, err := os.Stat(output); os.IsNotExist(err) {
+		os.MkdirAll(output, 0777)
+	}
+
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case record := <-recordChan:
+			fmt.Println(record)
 
 			if fileExist {
-				err := csvWriter.Write(record)
-				if err != nil {
+				if err := csvWriter.Write(record); err != nil {
 					printError(err.Error(), tableName)
 					return
 				}
@@ -39,21 +49,16 @@ func CreateCSV(ctx context.Context, maxLines int, output, tableName string, reco
 					fileCounter++
 					recordCounter = 0
 
-					csvWriter.Flush()
 					csvFile.Close()
+					csvWriter.Flush()
+					if err := csvWriter.Error(); err != nil {
+						printError(err.Error(), tableName)
+						return
+					}
 				}
 			} else {
-				if output[len(output)-1:] == "/" {
-					output = fmt.Sprintf("%s%s/", output, tableName)
-				} else {
-					output = fmt.Sprintf("%s/%s/", output, tableName)
-				}
-
-				if _, err := os.Stat(output); os.IsNotExist(err) {
-					os.MkdirAll(output, 0777)
-				}
-
-				fileName := fmt.Sprintf("%s%d.csv", output, fileCounter)
+				fileName := fmt.Sprintf("%s/%d.csv", output, fileCounter)
+				fmt.Println(fileName)
 				csvFile, err := os.Create(fileName)
 				if err != nil {
 					printError(err.Error(), tableName)
@@ -61,23 +66,20 @@ func CreateCSV(ctx context.Context, maxLines int, output, tableName string, reco
 				}
 
 				csvWriter = csv.NewWriter(csvFile)
-				err = csvWriter.Write(titles)
-				if err != nil {
+
+				if err = csvWriter.Write(titles); err != nil {
 					printError(err.Error(), tableName)
 					return
 				}
 
-				err = csvWriter.Write(titles)
-				if err != nil {
+				if err = csvWriter.Write(record); err != nil {
 					printError(err.Error(), tableName)
 					return
 				}
 				recordCounter++
 				fileExist = true
 			}
-
 		}
-
 	}
 }
 
@@ -85,3 +87,12 @@ func printError(errMsg, tableName string) {
 	msg := fmt.Sprintf("%s (table '%s')", errMsg, tableName)
 	log.Println(color.RedString(msg))
 }
+
+// TODO починить момент, когда указано maxLines больше, чем записей в таблице и когда
+// файл не полностью заполнен последний
+
+// и почему people таблица создает по maxLines = 2, хотя я указал 1
+
+// переделать генератор
+
+// разобраться с контекстом отмены
