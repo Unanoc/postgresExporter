@@ -45,13 +45,13 @@ func main() {
 	taskChan := make(chan config.Table, *numThreads)
 	for i := 0; i < *numThreads; i++ {
 		wg.Add(1)
-		go api.WorkerExport(ctx, wg, configInstance.OutputDir, taskChan, i)
+		go api.WorkerExport(ctx, wg, db.Conn, configInstance.OutputDir, taskChan)
 	}
 
 	for _, table := range configInstance.Tables {
 		taskChan <- *table
 	}
-	finish()
+	// finish()
 
 	syscallChan := make(chan os.Signal, 1)
 	signal.Notify(syscallChan, syscall.SIGINT, syscall.SIGTERM)
