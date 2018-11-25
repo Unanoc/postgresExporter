@@ -1,16 +1,16 @@
 {
     "connection": "postgres://testing:@localhost:5432/testing",
-    "output_dir": "./result",
+    "output_dir": "./../example/result",
     "tables": [
       {
         "name": "people",
-        "query": "select name, lastname, birthday from people",
-        "max_lines": 100
+        "query": "select firstname, lastname, phone, email, birthday from people",
+        "max_lines": 1
       },
       {
         "name": "cities",
-        "query": "select name, country from cities",
-        "max_lines": 1000
+        "query": "select name, population from cities",
+        "max_lines": 2
       }
     ]
   }

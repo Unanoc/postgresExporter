@@ -25,7 +25,7 @@ func main() {
 	defer conn.Close()
 
 	fmt.Println("-- TABLE PEOPLE --")
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 10; i++ {
 		firstname := fake.FirstName()
 		lastname := fake.LastName()
 		email := fake.EmailAddress()
@@ -46,7 +46,7 @@ func main() {
 	}
 
 	fmt.Println("-- TABLE CITIES --")
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 10; i++ {
 		cityName := fake.City()
 		population := rand.Int31()
 
