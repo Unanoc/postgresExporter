@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	pathToConfig = flag.String("config", "", "Path to configuration file")
+	pathToConfig = flag.String("config", "", "Path to configuration JSON file")
 	numThreads   = flag.Int("threads", 1, "Threads number")
 )
 
