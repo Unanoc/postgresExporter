@@ -6,17 +6,19 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/jackc/pgx"
 )
 
 // Query selects data from table and then sends record by record in chanel.
-func Query(conn *pgx.ConnPool, queryString string, recordChan chan<- []string) {
-
+func Query(conn *pgx.ConnPool, queryString, tableName string, recordChan chan<- []string) {
 	rows, err := conn.Query(queryString)
 	defer rows.Close()
 
 	if err != nil {
-		log.Println(err)
+		msg := fmt.Sprintf("%s (table '%s')", err.Error(), tableName)
+		log.Println(color.RedString(msg))
+		return
 	}
 
 	fields := rows.FieldDescriptions()
@@ -30,7 +32,10 @@ func Query(conn *pgx.ConnPool, queryString string, recordChan chan<- []string) {
 
 	for rows.Next() {
 		rowsRecord := make([]string, 1)
-		values, _ := rows.Values()
+		values, err := rows.Values()
+		if err != nil {
+			log.Println(color.RedString(err.Error()))
+		}
 		for _, value := range values {
 			if reflect.TypeOf(value).String() == "time.Time" {
 				time := value.(time.Time)
@@ -43,5 +48,10 @@ func Query(conn *pgx.ConnPool, queryString string, recordChan chan<- []string) {
 		recordChan <- rowsRecord
 	}
 
-	// return nil
+	if err != nil {
+		log.Println(color.RedString(err.Error()), color.BlueString(tableName))
+	} else {
+		msg := fmt.Sprintf("Table '%s' is successfully exported to CSV.", tableName)
+		log.Println(color.GreenString(msg))
+	}
 }
