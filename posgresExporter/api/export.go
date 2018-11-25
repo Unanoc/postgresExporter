@@ -1,9 +1,26 @@
 package api
 
-import "sync"
+import (
+	"context"
+	"psqlexport/config"
+	"psqlexport/database"
+	"sync"
 
-// Export exports data from PostgreSQL database to .CSV files.
-func Export(wg *sync.WaitGroup, stopCh <-chan struct{}, outDir, name, query, maxLines string) {
+	"github.com/jackc/pgx"
+)
+
+// WorkerExport exports data from PostgreSQL database to .CSV files.
+func WorkerExport(ctx context.Context, wg *sync.WaitGroup, conn *pgx.ConnPool, outputDir string, tasks <-chan config.Table) {
 	defer wg.Done()
 
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case task := <-tasks:
+			recordChan := make(chan []string)
+			go CreateCSV(ctx, task.Name, task.MaxLines, recordChan)
+			database.Query(conn, task.Query, recordChan)
+		}
+	}
 }
