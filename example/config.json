@@ -5,27 +5,27 @@
       {
         "name": "users",
         "query": "select firstname, lastname, phone, email, birthday from users",
-        "max_lines": 1000
+        "max_lines": 125
       },
       {
         "name": "vilages",
         "query": "select name, population from vilages",
-        "max_lines": 1000
+        "max_lines": 10
       },
       {
         "name": "people",
         "query": "select id, name, lastname, birthday, some_flag, created from people",
-        "max_lines": 1000
+        "max_lines": 30
       },
       {
         "name": "cities",
         "query": "select id, name, country_id, created from cities",
-        "max_lines": 1000
+        "max_lines": 900
       },
       {
         "name": "countries",
         "query": "select id, name, created from countries",
-        "max_lines": 1000
+        "max_lines": 10000
       }
     ]
   }
