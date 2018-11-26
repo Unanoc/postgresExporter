@@ -51,7 +51,6 @@ func main() {
 	for _, table := range configInstance.Tables {
 		taskChan <- *table
 	}
-	// finish()
 
 	syscallChan := make(chan os.Signal, 1)
 	signal.Notify(syscallChan, syscall.SIGINT, syscall.SIGTERM)
