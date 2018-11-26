@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx"
 )
 
-// Query selects data from table and then sends record by record in chanel.
+// Query selects data from table and then sends record by record in channel.
 func Query(conn *pgx.ConnPool, queryString, tableName string, recordChan chan<- []string) {
 	rows, err := conn.Query(queryString)
 	defer rows.Close()
