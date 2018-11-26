@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 
 	"github.com/fatih/color"
 )
@@ -37,6 +38,7 @@ func CreateCSV(ctx context.Context, maxLines int, output, tableName string, reco
 				return true
 			}
 			fmt.Println(fileName)
+			runtime.Gosched()
 		}
 		return false
 	}
