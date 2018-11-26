@@ -47,6 +47,7 @@ func Query(conn *pgx.ConnPool, queryString, tableName string, recordChan chan<- 
 		}
 		recordChan <- rowsRecord[1:]
 	}
+	close(recordChan)
 
 	if err != nil {
 		log.Println(color.RedString(err.Error()), color.BlueString(tableName))
