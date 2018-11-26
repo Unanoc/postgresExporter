@@ -109,6 +109,3 @@ func getCorrectDirPath(path, tableName string) string {
 	}
 	return path
 }
-
-// переделать генератор
-// разобраться с контекстом отмены
