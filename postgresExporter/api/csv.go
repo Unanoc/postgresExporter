@@ -24,6 +24,7 @@ func CreateCSV(ctx context.Context, maxLines int, output, tableName string, reco
 	if _, err := os.Stat(output); os.IsNotExist(err) {
 		os.MkdirAll(output, 0777)
 	}
+	fmt.Println(color.BlueString(output))
 
 	checkEqual := func() bool {
 		if recordCounter == maxLines {
@@ -37,7 +38,6 @@ func CreateCSV(ctx context.Context, maxLines int, output, tableName string, reco
 				printError(err.Error(), tableName)
 				return true
 			}
-			fmt.Println(fileName)
 			runtime.Gosched()
 		}
 		return false
@@ -91,7 +91,6 @@ func CreateCSV(ctx context.Context, maxLines int, output, tableName string, reco
 						printError(err.Error(), tableName)
 						return
 					}
-					fmt.Println(fileName)
 				}
 			}
 		}
