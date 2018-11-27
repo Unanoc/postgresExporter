@@ -1,17 +1,31 @@
 # Example
 
-### Создание БД, пользователя и заполнение данными
+### Локальное тестирование в Docker-контейнере
+Из корневой папки проекта (где лежит Dockerfile) ввести следующие команды:
 ```
-sh create_db.sh
-```
-
-### Экспорт данных из PostgreSQL в CSV
-```
-cd ../postgresExporter
-go run main.go --config="../example/config.json" --threads=4
+docker build . -t exporter_image
 ```
 
-### Удаление БД, пользователя и данных
+### Запуск Docker-контейнера и вход в терминал контейнера
 ```
-sh delete_db.sh
+docker run -it --name exporterContainer exporter_image /bin/bash
+```
+
+### Запуск экспортера
+Так как для примера сгенерировано 5 таблиц, то зададим threads = 5.
+```
+service postgresql start 
+./psqlexport --config="../example/config.json" --threads=5
+```
+
+### Проверка результата
+Перейдем в папку result, путь которой указан в конфиге example/config.json
+```
+cd /home/result
+```
+
+### Очистка
+```
+docker rm exporterContainer -f
+docker rmi exporter_image
 ```

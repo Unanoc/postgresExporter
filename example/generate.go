@@ -12,7 +12,7 @@ import (
 
 func main() {
 	var conn *pgx.ConnPool
-	pgxConfig, err := pgx.ParseURI("postgres://testing:@localhost:5432/testing")
+	pgxConfig, err := pgx.ParseURI("postgres://testing:testing@localhost:5432/testing")
 	if err != nil {
 		log.Panic(err)
 	}

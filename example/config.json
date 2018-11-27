@@ -1,6 +1,6 @@
 {
-    "connection": "postgres://testing:@localhost:5432/testing",
-    "output_dir": "./../example/result",
+    "connection": "postgres://testing:testing@localhost:5432/testing",
+    "output_dir": "/home/result",
     "tables": [
       {
         "name": "users",
