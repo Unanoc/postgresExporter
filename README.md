@@ -1,2 +1,2 @@
 # postgresExporter
-Exporting from PostgreSQL database to CSV files.
+Exporting tables from PostgreSQL database to CSV files.
