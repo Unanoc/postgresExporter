@@ -38,7 +38,6 @@ func CreateCSV(ctx context.Context, maxLines int, output, tableName string, reco
 				printError(err.Error(), tableName)
 				return true
 			}
-			runtime.Gosched()
 		}
 		return false
 	}
